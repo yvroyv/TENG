@@ -11,7 +11,7 @@ attemps = 0;                    %of values
 temp = 20;
 duty_cycle = 1;
 
-for i=1:10
+for i=1:20
     
 sim('wo_switch.slx')            %start simulation
 
@@ -37,8 +37,8 @@ Qteng = Charge.Values.Data;
 
 
 
-Square = max(Vteng)*max(Qteng)       %Track the Area of Square VQ
-Pavg = max(Pval)          %Calculate the Average Power Paverage
+Square = max(Vteng)*max(Qteng)  ;     %Track the Area of Square VQ
+Pavg = max(Pval)     ;     %Calculate the Average Power Paverage
 
 
 figure                               %Plotting again the selected Area
@@ -53,11 +53,21 @@ Sqarea(duty_cycle) = Square ;
 DCstamp(duty_cycle) = duty_cycle ;
 
 %%%%%%%%%%%%%%%    using Poweravg or Sqarea
-if (duty_cycle-2*temp > 0 )
-    if(Poweravg(duty_cycle) < Poweravg(duty_cycle-temp))
-        DCmax = duty_cycle;
+duty_cycle
+
+if (duty_cycle-2*temp > 0 && duty_cycle < 99)
+    
+        if(DCstamp(duty_cycle-temp)~=0)             %% find the last used duty cycle to compare with the new one
+            lu_dc = duty_cycle-temp;
+        elseif(DCstamp(duty_cycle-temp*2)~=0)
+            lu_dc = duty_cycle-temp*2;
+        else
+            lu_dc = duty_cycle-temp*2-1;
+        end
+    
+    if(Poweravg(duty_cycle) < Poweravg(lu_dc))          %% compare the two duty cycles
         duty_cycle = duty_cycle - 2*temp;
-        temp =  round(temp/2);
+        temp =  round(temp/2)
         if (temp == 1)
             break;
         end
@@ -67,11 +77,7 @@ if (duty_cycle-2*temp > 0 )
 else
     duty_cycle = duty_cycle + temp;
 end
-    
-    if(duty_cycle>99)
-         break;
-    end
-    
+       
 end
 %%%%%%%%%%%%%%%
 
@@ -79,4 +85,4 @@ end
 
 
 stem(DCstamp,Poweravg);             %Drawing plot of Power(Duty_Cycle)
-DCmax
+duty_cycle
