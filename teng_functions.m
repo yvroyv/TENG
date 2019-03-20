@@ -27,39 +27,56 @@ Charge = yout.getElement('charge');  %get values of Charge
 tc = Charge.Values.Time;
 Qteng = Charge.Values.Data;
 
+% Nsample = 2048;
+% Fsample = 1/Nsample;
+% Faxis = -Fsample/2:Fsample/Nsample:Fsample/2-Fsample/Nsample;
+% Fpower = fftshift(fft(Pval,Nsample));
+% F2I = abs(Fpower).^2;
+% 
+% IFP = sum(F2I)/5
+
+
+
 Square = max(Vteng)*max(Qteng)       %Track the Area of Square VQ
-Pavg = 0.707*max(abs(Pval))          %Calculate the Average Power Paverage
+Pavg = max(Pval)          %Calculate the Average Power Paverage
 
-% figure                               %Plotting again the selected Area
-% plot(Qteng,Vteng);
-% xlabel('Charge Q');
-% ylabel('Voltage V');
-% title('Square Area');
 
+figure                               %Plotting again the selected Area
+plot(Qteng,Vteng);
+xlabel('Charge Q');
+ylabel('Voltage V');
+title('Square Area');
+axis([0 5.5e-4 -300 300]);
 
 Poweravg(duty_cycle) = Pavg ;   
 Sqarea(duty_cycle) = Square ;
 DCstamp(duty_cycle) = duty_cycle ;
 
-%%%%%%%%%%%%%%%%    using Poweravg or Sqarea
-% if(i>1)
-%     if(Poweravg(duty_cycle) < Poweravg(duty_cycle-temp))
-%         duty_cycle = duty_cycle - round(temp/2);
-%         attemps = attemps +1;
-%     elseif (Poweravg(duty_cycle) > Poweravg(duty_cycle-temp) && attemps>1)
-%         DCmax = duty_cycle ;
-%     else
-%         duty_cycle = duty_cycle + temp;
-%     end
-% end
-%%%%%%%%%%%%%%%%
-duty_cycle = duty_cycle + temp;
-
-if(duty_cycle>99)
-    break
+%%%%%%%%%%%%%%%    using Poweravg or Sqarea
+if (duty_cycle-2*temp > 0 )
+    if(Poweravg(duty_cycle) < Poweravg(duty_cycle-temp))
+        DCmax = duty_cycle;
+        duty_cycle = duty_cycle - 2*temp;
+        temp =  round(temp/2);
+        if (temp == 1)
+            break;
+        end
+    else
+        duty_cycle = duty_cycle + temp;
+    end
+else
+    duty_cycle = duty_cycle + temp;
 end
-
+    
+    if(duty_cycle>99)
+         break;
+    end
+    
 end
+%%%%%%%%%%%%%%%
+
+
+
 
 stem(DCstamp,Poweravg);             %Drawing plot of Power(Duty_Cycle)
 DCmax
