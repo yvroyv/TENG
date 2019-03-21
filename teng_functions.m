@@ -11,7 +11,7 @@ attemps = 0;                    %of values
 temp = 20;
 duty_cycle = 1;
 
-for i=1:20
+for i=1:30
     
 sim('wo_switch.slx')            %start simulation
 
@@ -26,15 +26,6 @@ Vteng = Voltage.Values.Data;
 Charge = yout.getElement('charge');  %get values of Charge
 tc = Charge.Values.Time;
 Qteng = Charge.Values.Data;
-
-% Nsample = 2048;
-% Fsample = 1/Nsample;
-% Faxis = -Fsample/2:Fsample/Nsample:Fsample/2-Fsample/Nsample;
-% Fpower = fftshift(fft(Pval,Nsample));
-% F2I = abs(Fpower).^2;
-% 
-% IFP = sum(F2I)/5
-
 
 
 Square = max(Vteng)*max(Qteng)  ;     %Track the Area of Square VQ
@@ -53,7 +44,6 @@ Sqarea(duty_cycle) = Square ;
 DCstamp(duty_cycle) = duty_cycle ;
 
 %%%%%%%%%%%%%%%    using Poweravg or Sqarea
-duty_cycle
 
 if (duty_cycle-2*temp > 0 && duty_cycle < 99)
     
@@ -67,7 +57,7 @@ if (duty_cycle-2*temp > 0 && duty_cycle < 99)
     
     if(Poweravg(duty_cycle) < Poweravg(lu_dc))          %% compare the two duty cycles
         duty_cycle = duty_cycle - 2*temp;
-        temp =  round(temp/2)
+        temp =  round(temp/2);
         if (temp == 1)
             break;
         end
@@ -77,12 +67,11 @@ if (duty_cycle-2*temp > 0 && duty_cycle < 99)
 else
     duty_cycle = duty_cycle + temp;
 end
-       
+       attemps = attemps +1;
 end
 %%%%%%%%%%%%%%%
 
-
-
-
 stem(DCstamp,Poweravg);             %Drawing plot of Power(Duty_Cycle)
-duty_cycle
+duty_cycle-1
+Poweravg(duty_cycle)
+attemps
