@@ -7,13 +7,13 @@ Sqarea = zeros(99,1);           %of matrices
 DCstamp = zeros(99,1); 
 
 DCmax =0;                       %initialisation
-attemps = 0;                    %of values
-temp = 20;
+attemps = 1;                    %of values
+temp = 5;
 duty_cycle = 1;
 
 for i=1:30
     
-sim('wo_switch.slx')            %start simulation
+sim('final_circuit.slx')            %start simulation
 
 Pavg = yout.getElement('pavg'); %get values of Power
 tp = Pavg.Values.Time;
@@ -32,12 +32,12 @@ Square = max(Vteng)*max(Qteng)  ;     %Track the Area of Square VQ
 Pavg = max(Pval)     ;     %Calculate the Average Power Paverage
 
 
-figure                               %Plotting again the selected Area
-plot(Qteng,Vteng);
-xlabel('Charge Q');
-ylabel('Voltage V');
-title('Square Area');
-axis([0 5.5e-4 -300 300]);
+% figure                               %Plotting again the selected Area
+% plot(Qteng,Vteng);
+% xlabel('Charge Q');
+% ylabel('Voltage V');
+% title('Square Area');
+% axis([0 5.5e-4 -300 300]);
 
 Poweravg(duty_cycle) = Pavg ;   
 Sqarea(duty_cycle) = Square ;
@@ -72,6 +72,48 @@ end
 %%%%%%%%%%%%%%%
 
 stem(DCstamp,Poweravg);             %Drawing plot of Power(Duty_Cycle)
-duty_cycle-1
-Poweravg(duty_cycle)
+duty_cycle+2
+bs = Poweravg(duty_cycle+2)
 attemps
+
+sim('wo_buckswitch.slx')            %start simulation for circuit without buck and switch
+
+bPavg = yout.getElement('pavg1'); %get values of Power
+btp = bPavg.Values.Time;
+bPval = bPavg.Values.Data;
+
+bVoltage = yout.getElement('voltage1'); %get values of Voltage
+btv = bVoltage.Values.Time;
+bVteng = bVoltage.Values.Data;
+
+bCharge = yout.getElement('charge1');  %get values of Charge
+btc = bCharge.Values.Time;
+bQteng = bCharge.Values.Data;
+
+bPavg = max(bPval)     ;     %Calculate the Average Power Paverage
+
+
+
+sim('wo_buck.slx')            %start simulation for circuit without buck
+
+sPavg = yout.getElement('pavg'); %get values of Power
+stp = sPavg.Values.Time;
+sPval = sPavg.Values.Data;
+
+sVoltage = yout.getElement('voltage'); %get values of Voltage
+stv = sVoltage.Values.Time;
+sVteng = sVoltage.Values.Data;
+
+sCharge = yout.getElement('charge');  %get values of Charge
+stc = sCharge.Values.Time;
+sQteng = sCharge.Values.Data;
+
+sPavg = max(sPval)     ;     %Calculate the Average Power Paverage
+
+
+Difference_no_buck_no_switch = bs - bPavg   % find the differences
+Difference_no_buck = bs - sPavg
+
+Optimization_Percentage_without_buckswitch = ( bs/bPavg - 1 )*100
+Optimization_Percentage_without_buck = ( bs/sPavg - 1)*100
+
