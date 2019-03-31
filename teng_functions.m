@@ -2,6 +2,8 @@ clear
 clc 
 close all;
 
+ Vc_bat =110;
+
 Poweravg = zeros(99,1);         %initialisation
 Sqarea = zeros(99,1);           %of matrices
 DCstamp = zeros(99,1); 
@@ -23,13 +25,13 @@ Voltage = yout.getElement('voltage'); %get values of Voltage
 tv = Voltage.Values.Time;
 Vteng = Voltage.Values.Data;
 
-Charge = yout.getElement('charge');  %get values of Charge
+Charge = yout.getElement('charge1');  %get values of Charge
 tc = Charge.Values.Time;
 Qteng = Charge.Values.Data;
 
 
 Square = max(Vteng)*max(Qteng)  ;     %Track the Area of Square VQ
-Pavg = max(Pval)     ;     %Calculate the Average Power Paverage
+Pavg = max(Pval)          %Calculate the Average Power Paverage
 
 
 % figure                               %Plotting again the selected Area
@@ -96,7 +98,7 @@ bPavg = max(bPval)     ;     %Calculate the Average Power Paverage
 
 sim('wo_buck.slx')            %start simulation for circuit without buck
 
-sPavg = yout.getElement('pavg'); %get values of Power
+sPavg = yout.getElement('pavg1'); %get values of Power
 stp = sPavg.Values.Time;
 sPval = sPavg.Values.Data;
 
@@ -104,7 +106,7 @@ sVoltage = yout.getElement('voltage'); %get values of Voltage
 stv = sVoltage.Values.Time;
 sVteng = sVoltage.Values.Data;
 
-sCharge = yout.getElement('charge');  %get values of Charge
+sCharge = yout.getElement('charge1');  %get values of Charge
 stc = sCharge.Values.Time;
 sQteng = sCharge.Values.Data;
 
