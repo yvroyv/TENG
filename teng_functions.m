@@ -2,11 +2,13 @@ clear
 clc 
 close all;
 
- Vc_bat =110;
-
+Poweravgteng = zeros(99,1);
 Poweravg = zeros(99,1);         %initialisation
 Sqarea = zeros(99,1);           %of matrices
 DCstamp = zeros(99,1); 
+
+Opt_bs = [ 0 0 0 0 0 ];
+Opt_b = [ 0 0 0 0 0];
 
 DCmax =0;                       %initialisation
 attemps = 1;                    %of values
@@ -21,6 +23,10 @@ Pavg = yout.getElement('pavg'); %get values of Power
 tp = Pavg.Values.Time;
 Pval = Pavg.Values.Data;
 
+Pavgt = yout.getElement('Pteng'); %get values of Power
+tpt = Pavgt.Values.Time;
+Pvalt = Pavgt.Values.Data;
+
 Voltage = yout.getElement('voltage'); %get values of Voltage
 tv = Voltage.Values.Time;
 Vteng = Voltage.Values.Data;
@@ -32,6 +38,7 @@ Qteng = Charge.Values.Data;
 
 Square = max(Vteng)*max(Qteng)  ;     %Track the Area of Square VQ
 Pavg = max(Pval)          %Calculate the Average Power Paverage
+Pavgteng = max(Pvalt);
 
 
 % figure                               %Plotting again the selected Area
@@ -41,6 +48,7 @@ Pavg = max(Pval)          %Calculate the Average Power Paverage
 % title('Square Area');
 % axis([0 5.5e-4 -300 300]);
 
+Poweravgteng(duty_cycle) = Pavgteng;
 Poweravg(duty_cycle) = Pavg ;   
 Sqarea(duty_cycle) = Square ;
 DCstamp(duty_cycle) = duty_cycle ;
@@ -75,12 +83,15 @@ end
 
 stem(DCstamp,Poweravg);             %Drawing plot of Power(Duty_Cycle)
 duty_cycle+2
-bs = Poweravg(duty_cycle+2)
+bs = Poweravgteng(duty_cycle+2)
 attemps
 
+
+for Vc_bat = 30:20:110
+    
 sim('wo_buckswitch.slx')            %start simulation for circuit without buck and switch
 
-bPavg = yout.getElement('pavg1'); %get values of Power
+bPavg = yout.getElement('Pteng'); %get values of Power
 btp = bPavg.Values.Time;
 bPval = bPavg.Values.Data;
 
@@ -98,7 +109,7 @@ bPavg = max(bPval)     ;     %Calculate the Average Power Paverage
 
 sim('wo_buck.slx')            %start simulation for circuit without buck
 
-sPavg = yout.getElement('pavg1'); %get values of Power
+sPavg = yout.getElement('Pteng'); %get values of Power
 stp = sPavg.Values.Time;
 sPval = sPavg.Values.Data;
 
@@ -119,3 +130,19 @@ Difference_no_buck = bs - sPavg
 Optimization_Percentage_without_buckswitch = ( bs/bPavg - 1 )*100
 Optimization_Percentage_without_buck = ( bs/sPavg - 1)*100
 
+Opt_bs((Vc_bat-30)/20 + 1) = Optimization_Percentage_without_buckswitch;
+Opt_b((Vc_bat-30)/20 + 1) = Optimization_Percentage_without_buck;
+
+
+end
+
+
+f = figure;
+uit = uitable(f);
+
+d = {Opt_bs(1),Opt_b(1);Opt_bs(2),Opt_b(2);Opt_bs(3),Opt_b(3);Opt_bs(4),Opt_b(4);Opt_bs(5),Opt_b(5)};
+uit.Data = d;
+uit.Position = [20 20 363 112];
+
+uit.ColumnName = {'  Optimization of Buck and Switch  ','  Optimization of Buck  '};
+uit.RowName = {30,50,70,90,110};
